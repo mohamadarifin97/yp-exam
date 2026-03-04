@@ -1,66 +1,234 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📝 ExamSystem
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based online examination management system supporting three user roles: **Admin**, **Lecturer**, and **Student**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Backend:** Laravel 11, PHP 8.2
+- **Database:** PostgreSQL
+- **Frontend:** Blade, Tailwind CSS, Vanilla JavaScript
+- **Auth:** Laravel Breeze / built-in auth
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Feature | Description |
+|---|---|
+| 👨‍💼 Admin Dashboard | Full system stats, recent users & exams, pending marking, class/subject overview |
+| 👨‍🏫 Lecturer Dashboard | Exam summary, live exam monitor, open-text marking queue |
+| 👨‍🎓 Student Dashboard | Lists all exams available to the student's class with real-time status |
+| 📝 Exam Builder | Create exams with MCQ and open-text questions, correct answer marking, duration & schedule |
+| 🏫 Class Management | Create classes, enroll students, assign subjects. Students can only be in one class |
+| 📚 Subject Management | Manage subjects with active/inactive toggle, displayed as color-coded cards |
+| 👥 User Management | Full CRUD with role assignment (admin / lecturer / student) and status control |
+| ⏱️ Timed Exam Engine | Countdown timer with auto-submit on expiry. Timer turns red under 2 minutes |
+| ✏️ Open Text Marking | Lecturers award marks to written answers. Total score recalculates automatically |
+| 📊 Result & Review | Students see grade, score, percentage and full answer review after submission |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## User Roles
 
-## Laravel Sponsors
+### Admin
+- Full access to all modules
+- System-wide stats (users, exams, submissions, classes, subjects)
+- Manage all users, classes, subjects, and exams
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Lecturer
+- Create, edit, and delete exams with questions
+- Assign exams to one or more classes
+- Mark open-text answers submitted by students
+- View all classes and enrolled students (read-only)
+- Monitor live ongoing exams from dashboard
 
-### Premium Partners
+### Student
+- View only exams assigned to their enrolled class
+- Take timed exams (MCQ and open-text)
+- Auto-submit when time limit is reached
+- View result and full answer review after submission
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Database Schema
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Table | Description |
+|---|---|
+| `users` | All users. `role`: admin \| lecturer \| student. `class_id` links students to a class |
+| `school_classes` | Classes (model: `Kelas.php`). Students linked via `users.class_id` |
+| `subjects` | Learning subjects with `name` and boolean `status` |
+| `class_subject` | Pivot — many-to-many between `school_classes` and `subjects` |
+| `exams` | Exam records with `subject_id`, `start`, `end`, `duration` (minutes), `status` |
+| `class_exam` | Pivot — many-to-many between `exams` and `school_classes` |
+| `questions` | Questions per exam. `type`: mcq \| open_text. `marks` column |
+| `question_options` | Answer options for MCQ questions. `is_correct` boolean |
+| `exam_attempts` | Tracks each student attempt. `started_at`, `submitted_at`, `total_score` |
+| `student_answers` | MCQ uses `selected_option_id`; open text uses `answer_text`. `marks_awarded` for grading |
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Models & Relationships
 
-## Security Vulnerabilities
+```
+User
+  └─ belongsTo Kelas (class_id)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Kelas
+  ├─ hasMany User (students)
+  ├─ belongsToMany Subject (class_subject)
+  └─ belongsToMany Exam (class_exam)
+
+Subject
+  ├─ belongsToMany Kelas
+  └─ hasMany Exam
+
+Exam
+  ├─ belongsTo Subject
+  ├─ belongsToMany Kelas (class_exam)
+  ├─ hasMany Question
+  └─ hasMany ExamAttempt
+
+Question
+  ├─ belongsTo Exam
+  └─ hasMany QuestionOption
+
+ExamAttempt
+  ├─ belongsTo Exam
+  ├─ belongsTo User
+  └─ hasMany StudentAnswer
+
+StudentAnswer
+  ├─ belongsTo ExamAttempt
+  ├─ belongsTo Question
+  └─ belongsTo QuestionOption (selected_option_id)
+```
+
+---
+
+## Installation
+
+### Requirements
+- PHP >= 8.2
+- Composer
+- MySQL 8 / MariaDB
+- Node.js & npm
+
+### Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/examsystem.git
+cd examsystem
+
+# 2. Install dependencies
+composer install
+
+# 3. Environment setup
+cp .env.example .env
+php artisan key:generate
+
+# 4. Configure database in .env
+DB_DATABASE=examsystem
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+# 5. Run migrations
+php artisan migrate
+
+# 6. Seed the database
+php artisan db:seed
+
+# 7. Serve
+php artisan serve
+```
+
+---
+
+## Seeders
+
+| Seeder | Description |
+|---|---|
+| `UserSeeder` | Seeds admin, lecturer, and student accounts |
+| `ClassSubjectSeeder` | Seeds 8 subjects, 5 classes, distributes existing students across classes |
+
+```bash
+# Run all seeders
+php artisan db:seed
+
+# Run specific seeder
+php artisan db:seed --class=ClassSubjectSeeder
+```
+
+---
+
+## Routes
+
+### Admin & Lecturer
+```
+GET    /admin/dashboard                          Admin dashboard
+GET    /lecturer/dashboard                       Lecturer dashboard
+GET    /lecturer/classes                         View all classes and students
+
+Resource /users                                  User CRUD
+Resource /classes                                Class CRUD
+Resource /subjects                               Subject CRUD
+Resource /exams                                  Exam CRUD
+
+GET    /exams/{exam}/marking                     Open text marking interface
+POST   /answers/{answer}/mark                    Save mark for a student answer
+```
+
+### Student
+```
+GET    /student/dashboard                        Exam list for student's class
+GET    /student/exams/{exam}/start               Start an exam attempt
+POST   /student/exams/attempt/{attempt}/submit   Submit answers
+GET    /student/exams/attempt/{attempt}/result   View result and answer review
+```
+
+---
+
+## Exam Flow
+
+```
+Lecturer  →  Create exam with questions  →  Assign to class(es)  →  Set start/end + duration
+
+Student   →  Sees exam on dashboard  →  Click Start  →  Answers within time limit
+          →  Auto or manual submit  →  View result with answer review
+
+Lecturer  →  Open marking page  →  Award marks to open-text answers
+          →  Total score updates automatically
+```
+
+---
+
+## Design Conventions
+
+- All blade views are injected into `<main>{{ $slot }}</main>` — no repeated header/sidebar markup
+- Modals toggled via `classList.add/remove('hidden')` and `classList.add/remove('flex')`
+- Consistent design tokens:
+  - Cards: `rounded-2xl`, border `#e2e8f0`
+  - Gradient buttons: `#2563eb → #7c3aed`
+  - Focus ring: `box-shadow: 0 0 0 3px rgba(37,99,235,0.1)`
+- Avatar initials generated from first + last name initial with 5-color cycling palette
+- Pagination dark mode fixed via `php artisan vendor:publish --tag=laravel-pagination`
+
+---
+
+## Default Credentials
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin1@gmail.com | password |
+| Lecturer | lecturer1@gmail.com | password |
+| Student | student1@gmail.com | password |
+
+> ⚠️ Change all default passwords before deploying to production.
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT
